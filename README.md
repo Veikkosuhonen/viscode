@@ -1,3 +1,11 @@
+# Viscode
+
+Visualize an entire JavaScript project in a 3d environment
+
+Powered by React Three Fiber and Babel
+
+(Please note, it doesnt do shit atm)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
