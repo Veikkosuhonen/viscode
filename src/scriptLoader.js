@@ -1,8 +1,6 @@
 const { default: axios } = require('axios')
 const babel = require('@babel/parser')
 
-const url = 'https://raw.githubusercontent.com/UniversityOfHelsinkiCS/palaute/master/src/server/util/courseSummary/getOrganisationSummaries.js'
-
 const load = async (url) => {
     return axios.get(url).then(res => res.data)
 }
@@ -16,13 +14,23 @@ const getTree = (src) => {
     )
 }
 
-const getParsedCode = async () => {
-    const ast = getTree(await load(url))
-    console.log(Object.keys(ast))
-    console.log(Object.keys(ast.program))
+const getTopTokens = (ast, src) => 
+    ast.map(token => ({
+        name: token.declarations ? token.declarations[0].id.name : 'anon',
+        start: token.loc.start.line,
+        end: token.loc.end.line,
+        src: src.substring(token.loc.start.index, token.loc.end.index)
+    }))
+
+
+const getParsedCode = async (url) => {
+    const src = await load(url)
+    const ast = getTree(src).program.body
+    const tokens = getTopTokens(ast, src)
+    /*console.log(Object.keys(ast.program))
     console.log(Object.keys(ast.program.body))
-    console.log(Object.keys(ast.program.body))
-    return JSON.stringify(ast.program.body[0], null, 2)
+    console.log(Object.keys(ast.program.body))*/
+    return tokens
 }
 
 export default getParsedCode

@@ -1,82 +1,52 @@
 import ReactDOM from 'react-dom'
-import React, { Suspense, useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment, OrbitControls, useTexture,  MeshReflectorMaterial, Sky, Text, Html  } from '@react-three/drei'
+import React, { Suspense } from 'react'
+import *  as THREE from 'three'
+import { Canvas } from '@react-three/fiber'
+import { Sky, MapControls, Environment, Plane, MeshReflectorMaterial, useTexture  } from '@react-three/drei'
 import './styles.css'
-import axios from 'axios'
-import getParsedCode from './scriptLoader'
+import SourceFile from './SourceFile'
 
-function Box(props) {
-  // This reference gives us direct access to the THREE.Mesh object
-  const ref = useRef()
-  // Hold state for hovered and clicked events
-  const [hovered, hover] = useState(false)
-  const [clicked, click] = useState(false)
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  useFrame((state, delta) => (ref.current.rotation.x += 0.01))
-  // Return the view, these are regular Threejs elements expressed in JSX
-  return (
-    <mesh
-      {...props}
-      ref={ref}
-      scale={clicked ? 1.5 : 1}
-      onClick={(event) => click(!clicked)}
-      onPointerOver={(event) => hover(true)}
-      onPointerOut={(event) => hover(false)}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} emissive={1.0} />
-    </mesh>
-  )
-}
+const urls = [
+  'https://raw.githubusercontent.com/UniversityOfHelsinkiCS/palaute/master/src/server/controllers/courseSummaryController.js',
+  'https://raw.githubusercontent.com/UniversityOfHelsinkiCS/palaute/master/src/server/util/courseSummary/getOrganisationSummaries.js',
+  'https://raw.githubusercontent.com/UniversityOfHelsinkiCS/palaute/master/src/server/util/courseSummary/getCourseRealisationSummaries.js'
+]
 
-const Ground = () => (
-  <mesh rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-  <planeGeometry args={[1000, 1000]}/>
-  <MeshReflectorMaterial
-    resolution={512} 
-    mirror={0.4} mixBlur={6} mixStrength={1.5} 
-    normalMap={useTexture('./surface_normal.jpg')}
-    roughnessMap={useTexture('./surface_var.jpg')}
-    color="#a0a0a0" metalness={0.5}
-    normalScale={[2, 2]}
-    reflectorOffset={0.2}
-  />
-  </mesh>
+const GroundPlane = () => (
+  <Plane args={[1000, 2000]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 500]}>
+    <MeshReflectorMaterial 
+      color={new THREE.Color("#1a1a1a")} 
+      roughness={0.7}
+      mirror={1}
+      normalMap={useTexture('./surface_normal.jpg')}
+      normalScale={0.5}
+      reflectorOffset={1}
+    />
+  </Plane>
 )
 
-const Code = ({ ...props }) => {
-  
-  const [text, setText] = useState(null)
-  useEffect(() => {
-    getParsedCode().then(code => setText(code))
-  })
+const Scene = () => {
 
   return (
-    <Html transform>
-      <div>
-        <p>{text}</p>
-      </div>
-    </Html>
-  )
-}
-
-const Scene = () => (
-  <Canvas concurrent gl={{ alpha: false }} pixelRatio={[1, 1.5]} camera={{ position: [0, 100, 100], fov: 45 }} shadows>
-
-    <Suspense fallback={null}>
-      <Code position={[0, 1, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}/>
-      <Ground />
-      <Sky distance={450000} inclination={50} azimuth={0.25} elevation={0} />
-
-    </Suspense>
-
-    <ambientLight intensity={0.0} />
-    <directionalLight position={[-20, 0, -10]} intensity={0.2} />
     
-    <OrbitControls makeDefault />
-  </Canvas>
-)
+    <Canvas 
+      pixelRatio={[1, 1.5]} 
+      camera={{ position: [0, 100, 100], fov: 45, far: 4000 }} 
+    >
+      <color attach="background" args={["lightpink"]} />
 
+      <Suspense fallback={null}>
+        {urls.map((url, index) => <SourceFile key={index} pos={index-1} url={url}/> )}
+        {/*<Ground />*/}
+        <Sky distance={450000} inclination={50} azimuth={0.25} elevation={0} />
+        <Environment preset='city' />
+        <GroundPlane />
+      </Suspense>
+      <ambientLight intensity={0.1}/>
+      <MapControls makeDefault />
+    </Canvas>
+  )
+}
 ReactDOM.render(
   <Scene />,
   document.getElementById('root'),
