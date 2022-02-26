@@ -78,7 +78,6 @@ const findExpressionReferences = (expression) => {
         references.push(...findExpressionReferences(expression.right))
 
     } else if (expression.type === 'ObjectExpression') {
-        console.log('object expression with ' + expression.properties.length + ' on line ' + expression.loc.end.line)
         expression.properties.forEach(p => {
             references.push(...findExpressionReferences(p.value))
         })
@@ -117,7 +116,7 @@ const getParsedCode = async (url) => {
     const src = await load(url)
     const ast = getTree(src).program.body
     const tokens = getTopTokens(ast, src)
-    tokens.forEach(t => console.log(t.name, "references", t.references.map(r => r.name)))
+    // tokens.forEach(t => console.log(t.name, "references", t.references.map(r => r.name)))
     processReferences(tokens)
     //tokens.forEach(t => console.log(t.name, "references", t.references.map(r => r.name)))
 
