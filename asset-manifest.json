@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/Veikkosuhonen.github.io/viscode/static/css/main.9380d96f.css",
-    "main.js": "/Veikkosuhonen.github.io/viscode/static/js/main.a48b1749.js",
-    "index.html": "/Veikkosuhonen.github.io/viscode/index.html",
-    "main.9380d96f.css.map": "/Veikkosuhonen.github.io/viscode/static/css/main.9380d96f.css.map",
-    "main.a48b1749.js.map": "/Veikkosuhonen.github.io/viscode/static/js/main.a48b1749.js.map"
+    "main.css": "/viscode/static/css/main.9380d96f.css",
+    "main.js": "/viscode/static/js/main.a48b1749.js",
+    "index.html": "/viscode/index.html",
+    "main.9380d96f.css.map": "/viscode/static/css/main.9380d96f.css.map",
+    "main.a48b1749.js.map": "/viscode/static/js/main.a48b1749.js.map"
   },
   "entrypoints": [
     "static/css/main.9380d96f.css",
