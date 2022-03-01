@@ -2,7 +2,7 @@
   "name": "viscode",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/Veikkosuhonen.github.io/viscode",
+  "homepage": "https://Veikkosuhonen.github.io/viscode",
   "dependencies": {
     "@babel/parser": "^7.17.3",
     "@react-three/drei": "^8.10.6",
@@ -49,6 +49,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^3.2.3"
+    "gh-pages": "^3.2.3",
+    "serve": "^13.0.2"
   }
 }
