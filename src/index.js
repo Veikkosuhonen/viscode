@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber'
 import { Sky, MapControls, Plane, useTexture  } from '@react-three/drei'
 import './styles.css'
 import SourceFile from './SourceFile'
-import { EffectComposer, Outline, Scanline } from '@react-three/postprocessing'
+import { EffectComposer, Outline } from '@react-three/postprocessing'
 import { colors, init } from './colors'
 import useHovered from './useHovered'
 

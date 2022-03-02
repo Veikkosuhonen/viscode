@@ -1,17 +1,26 @@
 const { default: axios } = require('axios')
 const babel = require('@babel/parser')
 
-const load = async (url) => {
+const load = async (url: string): Promise<string> => {
     return axios.get(url).then(res => res.data)
 }
 
-const getTree = (src) => {
+const getTree = (src: string) => {
     return babel.parse(
         src,
         {
 
         }
     )
+}
+
+interface Token {
+    name: string,
+    start: number,
+    end: number,
+    src: string,
+    references: string[] | Token[],
+    index: number
 }
 
 const getTopTokens = (ast, src) => 
@@ -103,7 +112,7 @@ const findBlockReferences = (ast) => {
     return references
 }
 
-const processReferences = (tokens) => {
+const processReferences = (tokens: Token[]) => {
     tokens.forEach(token => {
         token.references = token.references
             .map(reference => ({ token: tokens.find(token2 => token2.name === reference.name), ...reference }))
@@ -112,7 +121,7 @@ const processReferences = (tokens) => {
 }
 
 
-const getParsedCode = async (url) => {
+const getParsedCode = async (url: string): Promise<Token[]> => {
     const src = await load(url)
     const ast = getTree(src).program.body
     const tokens = getTopTokens(ast, src)
