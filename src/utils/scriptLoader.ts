@@ -1,15 +1,13 @@
-const { default: axios } = require('axios')
+import { File } from "./fileSystem"
+
 const babel = require('@babel/parser')
 
-const load = async (url: string): Promise<string> => {
-    return axios.get(url).then(res => res.data)
-}
-
-const getTree = (src: string) => {
+const getTree = (src: string, jsx: boolean = false) => {
     return babel.parse(
         src,
         {
-
+            sourceType: "module",
+            plugins: ["jsx"]
         }
     )
 }
@@ -121,8 +119,8 @@ const processReferences = (tokens: Token[]) => {
 }
 
 
-const getParsedCode = async (url: string): Promise<Token[]> => {
-    const src = await load(url)
+const getParsedCode = async (file: File): Promise<Token[]> => {
+    const src = file.content
     const ast = getTree(src).program.body
     const tokens = getTopTokens(ast, src)
     // tokens.forEach(t => console.log(t.name, "references", t.references.map(r => r.name)))
