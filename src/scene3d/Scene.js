@@ -3,17 +3,20 @@ import { Canvas } from "@react-three/fiber"
 import { EffectComposer, Outline } from "@react-three/postprocessing"
 import { Suspense } from "react"
 import { colors } from "../utils/colors"
-import { GroundPlane } from "./GroundPlate"
 import SourceFile from "./SourceFile"
 import useHovered from "../hooks/useHovered"
 import { FlatText } from "./FlatText"
+import useFiles from "../hooks/useFiles"
 
-export const Scene = ({
-  files
-}) => {
+const toList = (parent) => parent.isDirectory ? [parent, ...parent.children.flatMap(toList)] : [parent]
 
-    const { hovered } = useHovered()
-  
+export const Scene = () => {
+    const { files } = useFiles()
+    // const { hovered } = useHovered()
+    console.log(`Rendering ${files?.length} files`)
+    const acualFiles = toList(files).filter(f => !f.isDirectory)
+    console.log(acualFiles)
+
     return (
       
       <Canvas 
@@ -24,21 +27,20 @@ export const Scene = ({
       >
   
         <Suspense fallback={null}>
-          {files 
-          ? files.map((file, index) => <SourceFile key={index} pos={index-1} file={file}/> )
-          : <FlatText text={"Loading repository"} fontSize={10} color={colors.snow1} />}
+          {acualFiles?.length !== 0
+          && acualFiles.map((file, index) => <SourceFile key={file.id} pos={index-1} file={file}/> )
+          }
           <Sky distance={450000} inclination={50} azimuth={0.25} elevation={0} />
-          <GroundPlane />
         </Suspense>
   
-        <ambientLight intensity={0.1}/>
+        <ambientLight intensity={0.2}/>
         <directionalLight position={[50, 200, -200]} intensity={0.2}/>
   
         <MapControls makeDefault maxPolarAngle={Math.PI / 3}/>
   
-        <EffectComposer multisampling={8} autoClear={false}>
-          <Outline blur selection={hovered} visibleEdgeColor={colors.success} edgeStrength={1}/>
-        </EffectComposer>
+        {/*<EffectComposer multisampling={8} autoClear={false}>
+          <Outline blur selection={hovered?.mesh} visibleEdgeColor={colors.success} edgeStrength={1}/>
+          </EffectComposer>*/}
       </Canvas>
     )
   }

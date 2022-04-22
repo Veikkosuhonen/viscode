@@ -22,14 +22,19 @@ interface Token {
 }
 
 const getTopTokens = (ast, src) => 
-    ast.map((token, index) => ({
-        name: token.declarations ? token.declarations[0].id.name : undefined,
-        start: token.loc.start.line,
-        end: token.loc.end.line,
-        src: src.substring(token.loc.start.index, token.loc.end.index),
-        references: findBlockReferences(token),
-        index
-    }))
+    ast.map((token, index) => {
+        const name = token.declarations ? token.declarations[0].id.name : (
+            token.declaration?.declarations ? token.declaration?.declarations[0]?.id.name : undefined
+        )
+        return {
+            name,
+            start: token.loc.start.line,
+            end: token.loc.end.line,
+            src: src.substring(token.loc.start.index, token.loc.end.index),
+            references: findBlockReferences(token),
+            index
+        }
+    })
 
 const findExpressionReferences = (expression) => {
 
@@ -98,9 +103,9 @@ const findBlockReferences = (ast) => {
 
     if (ast.type === 'VariableDeclaration') {
         ast.declarations.forEach(d => {
+            references.push(...findExpressionReferences(d.id))
             references.push(...findExpressionReferences(d.init))
         })
-
     } else if (ast.type === 'ExpressionStatement') {
         references.push(...findExpressionReferences(ast.expression))
     }

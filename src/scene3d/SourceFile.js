@@ -24,13 +24,14 @@ const SourceFile = ({ pos, file }) => {
     })
 
     const size = tokens ? tokenPosition(tokens[tokens.length - 1].end, tokens.length) + 20 : 0
-
     
+    const name = file?.url ? file.url.substr(file.url.lastIndexOf('/') + 1) : "Loading"
+
     return (
-        <group position={[pos * 100, 20, 0]}>
-            <FlatText text={file?.url || "Loading"} x={-30} z={-30} fontSize={14} color={colors.nord3} />
+        <group position={[pos * 200, 20, 0]}>
+            <FlatText text={name} x={-30} z={-30} fontSize={14} color={colors.nord3} />
             {tokens?.map(t => (
-                <group key={t.index}>
+                <group key={file.id + t.index}>
                     <Code 
                         token={t}
                         position={[0, 0, dimensions[t.index][1]]}

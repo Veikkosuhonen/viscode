@@ -2,9 +2,13 @@ import * as BrowserFS from "browserfs"
 
 
 export type File = {
+    id: string,
     url: string,
     content: string,
-    isDirectory: boolean
+    isDirectory: boolean,
+    selectedToView: boolean,
+    children: File[],
+    parent: File,
 }
 
 export class FileSystem {
@@ -21,24 +25,52 @@ export class FileSystem {
         this.fs = await this.initFileSystem()
     }
 
-    public async walkFiles(path: string, extension: string = "js"): Promise<File[]> {
-        this.fs.stat(path, (_, stats) => console.log(stats))
-        this.fs.stat(path + "/src", (_, stats) => console.log(stats))
-        const children: string[] = await this.readDir(path)
-        const files: File[] = []
-        await Promise.all(children.map(p => `${path}/${p}`).map(async child => {
-            console.log("path:" + child)
-            if (await this.isDirectory(child)) {
-                files.push(...await this.walkFiles(child)) 
-            } else if (child.endsWith(extension)) {
-                files.push({
-                    url: child,
-                    content: await this.readFile(child),
-                    isDirectory: false
+    public async walkFiles(path: string, extension: string = "js"): Promise<File> {
+        const root: File = {
+            id: "#",
+            url: path,
+            content: null,
+            isDirectory: true,
+            selectedToView: false,
+            children: [],
+            parent: null,
+        }
+        return this._walkFiles(root)
+    }
+
+    private async _walkFiles(parent: File, extension: string = "js"): Promise<File> {
+
+        const childrenUrls: string[] = await this.readDir(parent.url)
+        const children: File[] = []
+
+        await Promise.all(childrenUrls.map(p => `${parent.url}/${p}`).filter(Boolean).map(async (childUrl, i) => {
+            if (await this.isDirectory(childUrl)) {
+                const child: File = {
+                    id: parent.id + String.fromCharCode(i + 65),
+                    url: childUrl,
+                    content: null,
+                    isDirectory: true,
+                    selectedToView: false,
+                    children: [],
+                    parent
+                }
+                children.push(await this._walkFiles(child))
+            } else if (childUrl.endsWith(extension)) {
+                children.push({
+                    id: parent.id + String.fromCharCode(i + 65),
+                    url: childUrl,
+                    content: await this.readFile(childUrl),
+                    isDirectory: false,
+                    selectedToView: false,
+                    children: [],
+                    parent
                 })
             }
         }, this))
-        return files
+
+        parent.children = children
+
+        return parent
     }
 
     public readDir = async (path: string): Promise<string[]> => {
@@ -63,7 +95,7 @@ export class FileSystem {
         return new Promise((resolve, reject) => {
             console.log(`initializing fs`);
             BrowserFS.install(window);
-            BrowserFS.FileSystem.IndexedDB.Create({ storeName: "my-store", },
+            BrowserFS.FileSystem.InMemory.Create({ storeName: "my-store", },
                 (e, idbfs) => {
                     const inMemory = new BrowserFS.FileSystem.InMemory();
                     BrowserFS.FileSystem.AsyncMirror.Create(
