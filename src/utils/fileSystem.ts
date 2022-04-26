@@ -43,7 +43,10 @@ export class FileSystem {
         const childrenUrls: string[] = await this.readDir(parent.url)
         const children: File[] = []
 
-        await Promise.all(childrenUrls.map(p => `${parent.url}/${p}`).filter(Boolean).map(async (childUrl, i) => {
+        await Promise.all(childrenUrls.map(p => `${parent.url}/${p}`)
+            .filter(Boolean)
+            .filter(childUrl => !childUrl.includes('.git'))
+            .map(async (childUrl, i) => {
             if (await this.isDirectory(childUrl)) {
                 const child: File = {
                     id: parent.id + String.fromCharCode(i + 65),

@@ -4,13 +4,14 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import { createRoot } from 'react-dom/client';
+import { render } from 'react-dom'
 
 import { App } from './App'
 import { init } from './utils/colors'
 
 init()
 
-const container = document.getElementById('root');
-const root = createRoot(container);
-root.render(<App />);
+render(
+  <App />,
+  document.getElementById('root')
+);
