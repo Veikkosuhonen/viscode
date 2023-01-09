@@ -2,6 +2,8 @@
 
 [https://veikkosuhonen.github.io/viscode/](https://veikkosuhonen.github.io/viscode/)
 
+Warning: risk of literally fucking dying if you click the link. Bugged af
+
 Visualize a JavaScript project in a 3d environment
 
 Powered by React Three Fiber and Babel
